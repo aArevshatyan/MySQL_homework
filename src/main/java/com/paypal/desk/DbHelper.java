@@ -10,7 +10,6 @@ public class DbHelper {
 
     private static Connection getConnection() {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
             Connection connection = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/paypal",
                     "root",
@@ -19,7 +18,7 @@ public class DbHelper {
 
             System.out.println("Connection successful");
             return connection;
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
