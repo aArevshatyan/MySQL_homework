@@ -25,22 +25,17 @@ public class DbHelper {
     }
 
     static int createUser(String firstName, String lastName) {
-        String sql = "insert into users " +
-                "(first_name, last_name)" +
-                " values (" +
-                "'" + firstName + "'" +
-                ", " +
-                "'" + lastName + "'" +
-                ")";
-
         try {
 
-            Statement statement = connection.createStatement();
-            statement.execute(sql);
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "insert into users (first_name, last_name) values  (?,?);");
+            preparedStatement.setString(1,firstName);
+            preparedStatement.setString(2,lastName);
+            preparedStatement.executeUpdate();
 
-            String idSql = "select max(id) from users";
-            Statement idStatement = connection.createStatement();
-            ResultSet resultSet = idStatement.executeQuery(idSql);
+            PreparedStatement idStatement = connection.prepareStatement(
+                    "select max(id) from users");
+            ResultSet resultSet = idStatement.executeQuery();
 
             resultSet.next();
 
@@ -60,10 +55,10 @@ public class DbHelper {
      */
     static void cashFlow(int userId, double amount) {
         try {
-            String sqlBalance = "select balance from users where id = " + userId;
 
-            Statement idStatement = connection.createStatement();
-            ResultSet resultSet = idStatement.executeQuery(sqlBalance);
+            PreparedStatement preparedStatement = connection.prepareStatement("select balance from users where id = ?");
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             resultSet.next();
 
@@ -87,20 +82,15 @@ public class DbHelper {
      * @param amount   transaction amount
      */
     static int transaction(int userFrom, int userTo, double amount) {
-        String sql = "insert into transactions " +
-                "(user_from, user_to, transaction_amount)" +
-                " values (" +
-                "'" + userFrom + "'" +
-                ", " +
-                "'" + userTo + "'" +
-                ", " +
-                "'" + amount + "'" +
-                ")";
+         try {
 
-        try {
-
-            Statement statement = connection.createStatement();
-            statement.execute(sql);
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "insert into transactions (user_from, user_to, transaction_amount) " +
+                            "values (?, ?, ?)");
+            preparedStatement.setInt(1, userFrom);
+            preparedStatement.setInt(2, userTo);
+            preparedStatement.setDouble(3, amount);
+            preparedStatement.execute();
 
             cashFlow(userFrom, -amount);
             cashFlow(userTo, amount);
