@@ -55,18 +55,10 @@ public class DbHelper {
      */
     static void cashFlow(int userId, double amount) {
         try {
-
-            PreparedStatement preparedStatement = connection.prepareStatement("select balance from users where id = ?");
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            resultSet.next();
-
-            double oldBalance = resultSet.getInt(1);
-            String sqlUpdate = "update users set balance = " + (oldBalance + amount) + "where id = " + userId;
-
-            Statement statement = connection.createStatement();
-            statement.execute(sqlUpdate);
+            PreparedStatement preparedStatement = connection.prepareStatement( "update users set balance = balance + ? where id = ?");
+            preparedStatement.setDouble(1, amount);
+            preparedStatement.setInt(2, userId);
+            preparedStatement.execute();
 
         } catch (SQLException e) {
             e.printStackTrace();
